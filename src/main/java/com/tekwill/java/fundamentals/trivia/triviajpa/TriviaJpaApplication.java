@@ -5,9 +5,7 @@ import com.tekwill.java.fundamentals.trivia.triviajpa.domain.Question;
 import com.tekwill.java.fundamentals.trivia.triviajpa.engine.TriviaAdmin;
 import com.tekwill.java.fundamentals.trivia.triviajpa.engine.TriviaGame;
 import com.tekwill.java.fundamentals.trivia.triviajpa.service.QuestionService;
-import net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener;
-import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,10 +19,8 @@ import java.util.List;
 import java.util.Scanner;
 
 @SpringBootApplication
+@Slf4j
 public class TriviaJpaApplication {
-
-	@Autowired
-	private DataSource dataSource;
 
 	public static void main(String[] args) {
 		SpringApplication.run(TriviaJpaApplication.class, args);
@@ -33,6 +29,8 @@ public class TriviaJpaApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(TriviaAdmin triviaAdmin, TriviaGame triviaGame, QuestionService questionService){
 		return args -> {
+			log.info("Game is loading up...");
+			log.debug("Saving questions...");
 			List<Question> questions = new ArrayList<>(Arrays.asList(
 					new Question(100, 1, "How many wings does a mosquito have?",
 								 new HashSet<>(Arrays.asList(new Answer("Two", true, "A"), new Answer("Three", false, "B"),
@@ -59,6 +57,7 @@ public class TriviaJpaApplication {
 											   new Answer("In the boot", false, "C"), new Answer("In the dolpa", false, "D"))))));
 
 			questions.forEach(questionService::save);
+			log.debug("[{}] questions saved...", questions);
 
 			Scanner scanner = new Scanner(System.in);
 			boolean gameMenuRunning = true;
@@ -77,6 +76,7 @@ public class TriviaJpaApplication {
 				}
 
 			} while (gameMenuRunning);
+			log.info("Game shutdown...");
 		};
 	}
 }
